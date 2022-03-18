@@ -42,6 +42,13 @@ GENERATED_CPP = [
     "autograd/generated/python_variable_methods.cpp",
 ]
 
+# This is duplicated in caffe2/CMakeLists.txt for now and not yet used in buck
+GENERATED_LAZY_TS_CPP = [
+    "lazy/generated/LazyNativeFunctions.cpp",
+    "lazy/generated/RegisterAutogradLazy.cpp",
+    "lazy/generated/RegisterLazy.cpp",
+]
+
 # NVFuser runtime library
 libtorch_nvfuser_runtime_sources = [
     "torch/csrc/jit/codegen/cuda/runtime/bf16_support.cu",
@@ -434,14 +441,26 @@ lazy_tensor_core_sources = [
     "torch/csrc/lazy/core/view_ops/unsqueeze.cpp",
     "torch/csrc/lazy/core/view_ops/select_view_update.cpp",
     "torch/csrc/lazy/core/view_ops/view.cpp",
+]
+
+lazy_tensor_ts_sources = [
     "torch/csrc/lazy/ts_backend/config.cpp",
     "torch/csrc/lazy/ts_backend/ops/arithmetic_ir_ops.cpp",
+    "torch/csrc/lazy/ts_backend/ops/batch_norm_ops.cpp",
     "torch/csrc/lazy/ts_backend/ops/cast.cpp",
     "torch/csrc/lazy/ts_backend/ops/device_data.cpp",
     "torch/csrc/lazy/ts_backend/ops/expand.cpp",
     "torch/csrc/lazy/ts_backend/ops/generic.cpp",
+    "torch/csrc/lazy/ts_backend/ops/random_ops.cpp",
     "torch/csrc/lazy/ts_backend/ops/scalar.cpp",
+    "torch/csrc/lazy/ts_backend/ts_autograd_functions.cpp",
+    "torch/csrc/lazy/ts_backend/ts_backend_impl.cpp",
+    "torch/csrc/lazy/ts_backend/ts_lowering_context.cpp",
     "torch/csrc/lazy/ts_backend/ts_node.cpp",
+    "torch/csrc/lazy/ts_backend/ts_native_functions.cpp",
+    "torch/csrc/lazy/ts_backend/ts_node_lowering.cpp",
+    "torch/csrc/lazy/ts_backend/tensor_aten_ops.cpp",
+    "torch/csrc/lazy/ts_backend/ts_eager_fallback.cpp",
 ]
 
 lazy_tensor_core_python_sources = [
@@ -592,7 +611,7 @@ libtorch_lite_cmake_sources = sorted(
     torch_mobile_core,
 )
 
-libtorch_cmake_sources = libtorch_core_sources + libtorch_core_jit_sources
+libtorch_cmake_sources = libtorch_core_sources + libtorch_core_jit_sources + lazy_tensor_ts_sources
 
 libtorch_extra_sources = libtorch_core_jit_sources + [
     "torch/csrc/autograd/TraceTypeManual.cpp",

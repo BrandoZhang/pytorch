@@ -349,19 +349,22 @@ if(NOT INTERN_BUILD_MOBILE OR NOT BUILD_CAFFE2_MOBILE)
       "${TORCH_SRC_DIR}/csrc/autograd/generated/TraceType_4.cpp"
       "${TORCH_SRC_DIR}/csrc/autograd/generated/ADInplaceOrViewType_0.cpp"
       "${TORCH_SRC_DIR}/csrc/autograd/generated/ADInplaceOrViewType_1.cpp"
+      "${TORCH_SRC_DIR}/csrc/lazy/generated/LazyNativeFunctions.cpp"
+      "${TORCH_SRC_DIR}/csrc/lazy/generated/RegisterAutogradLazy.cpp"
+      "${TORCH_SRC_DIR}/csrc/lazy/generated/RegisterLazy.cpp"
     )
   endif()
 
   set(GENERATED_H_TORCH
     "${TORCH_SRC_DIR}/csrc/autograd/generated/Functions.h"
     "${TORCH_SRC_DIR}/csrc/autograd/generated/variable_factories.h"
-    "${TORCH_SRC_DIR}/csrc/lazy/generated/LazyIr.h"
-    "${TORCH_SRC_DIR}/csrc/lazy/generated/LazyNativeFunctions.h"
     )
 
   if(NOT INTERN_DISABLE_AUTOGRAD)
     list(APPEND GENERATED_H_TORCH
       "${TORCH_SRC_DIR}/csrc/autograd/generated/VariableType.h"
+      "${TORCH_SRC_DIR}/csrc/lazy/generated/LazyIr.h"
+      "${TORCH_SRC_DIR}/csrc/lazy/generated/LazyNativeFunctions.h"
     )
   endif()
 
@@ -399,6 +402,11 @@ if(NOT INTERN_BUILD_MOBILE OR NOT BUILD_CAFFE2_MOBILE)
     ${GENERATED_TESTING_PYTHON}
     )
 
+  set(GEN_PER_OPERATOR_FLAG)
+  if(USE_PER_OPERATOR_HEADERS)
+    list(APPEND GEN_PER_OPERATOR_FLAG "--per_operator_headers")
+  endif()
+
   add_custom_command(
     OUTPUT
     ${TORCH_GENERATED_CODE}
@@ -410,10 +418,12 @@ if(NOT INTERN_BUILD_MOBILE OR NOT BUILD_CAFFE2_MOBILE)
       $<$<BOOL:${SELECTED_OP_LIST}>:--selected-op-list-path="${SELECTED_OP_LIST}">
       --force_schema_registration
       --gen_lazy_ts_backend
+      ${GEN_PER_OPERATOR_FLAG}
     DEPENDS
     "${TORCH_ROOT}/aten/src/ATen/native/native_functions.yaml"
     "${TORCH_ROOT}/aten/src/ATen/native/ts_native_functions.yaml"
     "${TORCH_ROOT}/torch/csrc/lazy/core/shape_inference.h"
+    "${TORCH_ROOT}/torch/csrc/lazy/ts_backend/ts_native_functions.cpp"
     "${TORCH_ROOT}/aten/src/ATen/templates/DispatchKeyNativeFunctions.h"
     "${TORCH_ROOT}/aten/src/ATen/templates/DispatchKeyNativeFunctions.cpp"
     "${TORCH_ROOT}/aten/src/ATen/templates/LazyIr.h"
